@@ -1,0 +1,41 @@
+﻿Step 0: 
+* create the conda environment by using the provided file: environment.yml
+* download the D4RL dataset through the file: obtain_original_data.ipynb
+
+Step 1: model MDP by SCM.
+
+        Go to the folder: step_1_train_scm_model.
+        Run: python train_scm_model.py 
+                        --data_path Original_datasets/* 
+                        --loss_save_path Original_datasets_saved_loss/*
+                        --model_save_path Original_datasets_model/*
+
+Note: 
+* The causal structure is defined at: step_2_run_rl_algorithm/offlinerlkit_modified/S_A_NS_SCM/data/meta_data.py.
+* Before the algorithm starts training the data augmentation happens at: step_2_run_rl_algorithm/offlinerlkit_modified/buffer/buffer.py → def load_dataset_and_augment().
+
+Step 2: train rl algorithm.
+
+        Go to the folder: step_2_run_rl_algorithm.
+        Run offline algorithm, e.g.  cql:  python run_example/run_cql.py
+            --trained_scm_path * # load the trained scm model in step 1.
+            --original_data_path * # the path to original dataset.
+            --vars_dim_list 11 3 1 11 # depend on the dimension of (state, action, reward, next state)
+            --num_samples 10 # default size of  counterfactuals
+            --sample_range 0.01 # default perturbation size for all experiments
+            --prob_l 0.0
+            --prob_r 1.0
+            --index_1 11 # perturb exogenous variable of action node
+            --index_2 14 # perturb exogenous variable of action node
+            --topk 1 # closest neighbor selection
+            --weight_aug 0.9 # mix ratio with the original dataset
+            --tag * # used to identify each sub folder in the log folder.
+            --epoch 1000
+            --batch-size 256
+            --step_size 1000
+            --lr_gamma 1.0
+            --algo-name cql
+            --task hopper-medium-v2 
+            --seed 0
+
+
